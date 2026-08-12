@@ -1,8 +1,9 @@
 [build]
 builder = "RAILPACK"
+buildCommand = "npm --prefix backend install && npm --prefix frontend install && npm --prefix frontend run build"
 
 [deploy]
-startCommand = "npm start"
+startCommand = "npm --prefix backend start"
 healthcheckPath = "/api/v1/health"
 healthcheckTimeout = 100
 restartPolicyType = "ON_FAILURE"

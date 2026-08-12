@@ -47,32 +47,21 @@ npm run build
 
 ## Deployment
 
-Deploy two services from this repository in one Railway project. Railway recommends separate root directories for isolated monorepo applications.
+Deploy one Railway service from the repository root. The build creates `frontend/dist`, and Express serves the React application and `/api/v1` from the same domain.
 
-### Frontend service
-
-- Root Directory: `/frontend`
-- Config file path: `/frontend/railway.toml`
-- Health endpoint: `/health`
-- Generate a public Railway domain
-- `VITE_API_URL=https://YOUR-BACKEND-DOMAIN/api/v1`
-- `VITE_STRIPE_PUBLISHABLE_KEY=pk_test_...` (test mode until acceptance is complete)
-
-The production server serves `dist/` and falls back to `index.html`, so direct refreshes such as `/app/products` and `/pos` work.
-
-### Backend service
-
-- Root Directory: `/backend`
-- Config file path: `/backend/railway.toml`
+- Root Directory: `/`
+- Config file path: `/railway.toml`
 - Health endpoint: `/api/v1/health`
-- Generate a public Railway domain
+- Generate one public Railway domain
+- Set `VITE_API_URL=/api/v1`
+- Set `VITE_STRIPE_PUBLISHABLE_KEY=pk_test_...` until acceptance is complete
 
-Set `NODE_ENV=production` and `CORS_ORIGINS=https://YOUR-FRONTEND-DOMAIN`. Add the existing Supabase, Stripe, Resend, timezone, and logging variables from `backend/.env.example` to this service only.
+Set `NODE_ENV=production` and `CORS_ORIGINS=https://YOUR-RAILWAY-DOMAIN`. Add the Supabase, Stripe, Resend, timezone, and logging variables from `backend/.env.example` to the same service.
 
-After both domains exist, update `VITE_API_URL` and `CORS_ORIGINS`, then redeploy both services. Configure Stripe's test webhook destination as:
+Configure Stripe's test webhook destination as:
 
 ```text
-https://YOUR-BACKEND-DOMAIN/api/v1/payments/stripe/webhook
+https://YOUR-RAILWAY-DOMAIN/api/v1/payments/stripe/webhook
 ```
 
 Provider and database secrets belong only in the backend service. Never expose `SUPABASE_SERVICE_ROLE_KEY`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, or `RESEND_API_KEY` through `VITE_` variables.

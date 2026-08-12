@@ -1,5 +1,7 @@
 import express from 'express'
 import cors from 'cors'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { AppError } from './errors/AppError.js'
 import { requestIdMiddleware } from './middleware/requestId.middleware.js'
 import { requestLoggerMiddleware } from './middleware/requestLogger.middleware.js'
@@ -21,6 +23,11 @@ import {
 import { createReportRouter } from './modules/reports/report.routes.js'
 import { createReturnRouter } from './modules/returns/return.routes.js'
 import { createRateLimiters, onlyMethods } from './middleware/rateLimit.middleware.js'
+
+const frontendDirectory = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)),
+  '../../frontend/dist'
+)
 
 export function createApp({
   config,
@@ -85,6 +92,14 @@ export function createApp({
   app.use('/api/v1', createPaymentRouter({ authService, paymentService }))
   app.use('/api/v1', createReportRouter({ authService, reportService, notificationService }))
   app.use('/api/v1', createReturnRouter({ authService, returnService }))
+
+  if (config.nodeEnv === 'production') {
+    app.use(express.static(frontendDirectory, { index: false }))
+    app.get('/{*path}', (req, res, next) => {
+      if (req.path.startsWith('/api/')) return next()
+      return res.sendFile(path.join(frontendDirectory, 'index.html'))
+    })
+  }
 
   app.use(notFoundMiddleware)
   app.use(errorMiddleware({ logger, nodeEnv: config.nodeEnv }))

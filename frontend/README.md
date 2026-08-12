@@ -1,6 +1,6 @@
 # Shopwise React frontend
 
-React/Vite replacement for the legacy static Shopwise MiniPOS frontend.
+React/Vite application served by the Express backend in production.
 
 ## Run locally
 
@@ -10,7 +10,7 @@ npm install
 npm run dev
 ```
 
-Set `VITE_API_URL=http://localhost:5000/api/v1`. Add only a Stripe test publishable key to `VITE_STRIPE_PUBLISHABLE_KEY` when testing card payments.
+The local frontend uses `VITE_API_URL=http://localhost:5000/api/v1`. Add only a Stripe test publishable key to `VITE_STRIPE_PUBLISHABLE_KEY` when testing card payments.
 
 ## Commands
 
@@ -20,15 +20,8 @@ npm test
 npm run build
 ```
 
-## Railway deployment
+## Railway
 
-Create a Railway service with Root Directory `/frontend`. The checked-in `railway.toml` builds the Vite application and starts the production static server. The server binds Railway's `PORT`, exposes `/health`, and supports React Router refreshes.
+Railway deploys from the repository root using `/railway.toml`. The React application is built into `frontend/dist`, then the Express backend serves it alongside `/api/v1` from one domain.
 
-Set these public build variables on the frontend service:
-
-```text
-VITE_API_URL=https://YOUR-BACKEND.up.railway.app/api/v1
-VITE_STRIPE_PUBLISHABLE_KEY=pk_test_...
-```
-
-Backend and provider secrets must never use `VITE_` variables.
+Set `VITE_API_URL=/api/v1` in Railway. Backend and provider secrets must never use `VITE_` variables.

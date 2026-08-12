@@ -1,4 +1,8 @@
-const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1').replace(/\/$/, '')
+const API_URL = (
+  import.meta.env.VITE_API_URL ||
+  (import.meta.env.DEV ? 'http://localhost:5000/api/v1' : '/api/v1')
+).replace(/\/$/, '')
+const apiOrigin = typeof window === 'undefined' ? 'http://localhost' : window.location.origin
 const SESSION_KEY = 'shopwise.react.session'
 let refreshRequest = null
 
@@ -42,7 +46,7 @@ async function refreshSession() {
 }
 
 export async function apiRequest(path, { method = 'GET', body, query, auth = true, retryAuth = true } = {}) {
-  const url = new URL(`${API_URL}${path.startsWith('/') ? path : `/${path}`}`)
+  const url = new URL(`${API_URL}${path.startsWith('/') ? path : `/${path}`}`, apiOrigin)
   Object.entries(query || {}).forEach(([key, value]) => { if (value !== undefined && value !== null && value !== '') url.searchParams.set(key, value) })
   const session = sessionStore.read()
   const headers = { Accept: 'application/json' }
